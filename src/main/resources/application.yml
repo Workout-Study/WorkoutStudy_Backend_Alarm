@@ -1,3 +1,7 @@
 spring:
   application:
     name: WorkoutStudy_Backend_Alarm
+
+firebase:
+  project-id: workoutstudy-98d89
+  key-path: workoutstudy-98d89-firebase-adminsdk-pazxk-9b95472a29.json
