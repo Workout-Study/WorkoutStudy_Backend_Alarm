@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: WorkoutStudy_Backend_Alarm
