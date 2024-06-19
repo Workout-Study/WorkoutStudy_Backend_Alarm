@@ -15,6 +15,7 @@ public class FcmService {
 
     private final TokenRepository tokenRepository;
 
+    // 푸시 알림 클릭 시 액션을 구현할 수 있도록 설정.
     public void sendByToken(FcmServiceDto dto){
         String token = getToken(dto.getUsername());
 
