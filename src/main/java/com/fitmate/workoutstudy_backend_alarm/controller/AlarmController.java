@@ -18,13 +18,13 @@ public class AlarmController {
     private final WebhookService webhookService;
 
     @PostMapping("/wallet/penalty-complete")
-    public void penaltyComplete(@RequestBody PenaltyCompleteDto penaltyCompleteDto) throws FirebaseMessagingException {
+    public void penaltyComplete(@RequestBody PenaltyCompleteDto penaltyCompleteDto) {
         // wallet 서버 웹훅
         webhookService.sendPenaltyCompleteWebhook(penaltyCompleteDto);
     }
 
     @PostMapping("/chat/real-time-chat")
-    public void realTimeChat(@RequestBody ChatDto chatDto) throws FirebaseMessagingException {
+    public void realTimeChat(@RequestBody ChatDto chatDto) {
         // chat 서버 웹훅
         webhookService.sendRealTimeChatWebhook(chatDto);
     }

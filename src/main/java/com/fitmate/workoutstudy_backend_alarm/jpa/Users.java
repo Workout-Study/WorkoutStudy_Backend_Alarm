@@ -13,8 +13,7 @@ import org.hibernate.annotations.DynamicInsert;
 @Table(name = "users")
 @DynamicInsert
 public class Users extends BaseEntity{
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
     private String oauthId;
     private String oauthType;
