@@ -1,7 +1,20 @@
 spring:
+  container-name: ${CONTAINER_NAME}
   application:
-    name: WorkoutStudy_Backend_Alarm
+    name: alarm-service
 
+  datasource:
+    url: jdbc:postgresql://postgresql-auth:5432/postgres
+    username: auth
+    password: auth1!
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 firebase:
-  project-id: workoutstudy-98d89
-  key-path: workoutstudy-98d89-firebase-adminsdk-pazxk-9b95472a29.json
+  project-id: fitmate-e2b03
+  key-path: fitmate-e2b03-firebase-adminsdk-6aeom-500f4fc3e9.json
