@@ -29,4 +29,16 @@ public class AlarmController {
         webhookService.sendRealTimeChatWebhook(chatDto);
     }
 
+    @PostMapping("/wallet/penalty-complete/single")
+    public void penaltyCompleteSingle(@RequestBody PenaltyCompleteDto penaltyCompleteDto) {
+        // wallet 서버 웹훅
+        webhookService.sendPenaltyCompleteWebhookSingle(penaltyCompleteDto);
+    }
+
+    @PostMapping("/chat/real-time-chat/single")
+    public void realTimeChatSingle(@RequestBody ChatDto chatDto) {
+        // chat 서버 웹훅
+        webhookService.sendRealTimeChatWebhookSingle(chatDto);
+    }
+
 }
