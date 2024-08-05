@@ -13,14 +13,19 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class WebhookService {
 
     private final UsersRepository usersRepository;
+    private final FitGroupService fitGroupService;
 
     public void sendPenaltyCompleteWebhook(PenaltyCompleteDto penaltyCompleteDto) {
         Users users = usersRepository.findByUserId(penaltyCompleteDto.getUserId());
@@ -57,41 +62,44 @@ public class WebhookService {
     }
 
     public void sendRealTimeChatWebhook(ChatDto chatDto) {
-        Users users = usersRepository.findByUserId(chatDto.getUserId());
-        String token = users.getFcmToken();
-        Message message = Message.builder()
-                .setToken(token)
-                .setNotification(Notification.builder()
-                        .setTitle(String.valueOf(chatDto.getUserId()))
-                        .setBody(chatDto.getMessage())
-                        .build())
-                .putData("userId", String.valueOf(chatDto.getUserId()))
-                .putData("messageId", chatDto.getMessageId())
-                .putData("fitgroupId", String.valueOf(chatDto.getFitgroupId()))
-                .putData("fitMateId", String.valueOf(chatDto.getFitMateId()))
-                .putData("message", chatDto.getMessage())
-                .putData("messageTime", chatDto.getMessageTime())
-                .putData("messageType", String.valueOf(chatDto.getMessageType()))
-                .setAndroidConfig(AndroidConfig.builder()
-                        .setNotification(AndroidNotification.builder()
-                                .setTitle(String.valueOf(chatDto.getUserId()))
-                                .setBody(chatDto.getMessage())
-                                .build())
-                        .build())
-                .setApnsConfig(ApnsConfig.builder()
-                        .setAps(Aps.builder()
-                                .setBadge(42)
-                                .build())
-                        .build())
-                .setTopic("wallet-service")
-                .build();
+        Long fitGroupId = (long) chatDto.getFitgroupId();
+        List<Long> fitMateIdsFromExternalApi = fitGroupService.getFitMateIdsFromExternalApi(fitGroupId, chatDto.getUserId());
 
-        try {
-            String response = FirebaseMessaging.getInstance().send(message);
-            log.info("FCM send-" + response);
-        } catch (FirebaseMessagingException e) {
-            log.info("FCM except-" + e.getMessage());
-            throw new RuntimeException(e);
+        for (Long userId : fitMateIdsFromExternalApi) {
+            Users users = usersRepository.findByUserId(userId);
+            String token = users.getFcmToken();
+            Message message = Message.builder()
+                    .setToken(token)
+                    .setNotification(Notification.builder()
+                            .setTitle(String.valueOf(chatDto.getUserId()))
+                            .setBody(chatDto.getMessage())
+                            .build())
+                    .putData("userId", String.valueOf(chatDto.getUserId()))
+                    .putData("messageId", chatDto.getMessageId())
+                    .putData("fitGroupId", String.valueOf(chatDto.getFitgroupId()))
+                    .putData("fitMateId", String.valueOf(userId))
+                    .putData("message", chatDto.getMessage())
+                    .putData("messageTime", chatDto.getMessageTime())
+                    .putData("messageType", String.valueOf(chatDto.getMessageType()))
+                    .setAndroidConfig(AndroidConfig.builder()
+                            .setNotification(AndroidNotification.builder()
+                                    .setTitle(String.valueOf(chatDto.getUserId()))
+                                    .setBody(chatDto.getMessage())
+                                    .build())
+                            .build())
+                    .setApnsConfig(ApnsConfig.builder()
+                            .setAps(Aps.builder()
+                                    .setBadge(42)
+                                    .build())
+                            .build())
+                    .build();
+            try {
+                String response = FirebaseMessaging.getInstance().send(message);
+                log.info("FCM send-" + response);
+            } catch (FirebaseMessagingException e) {
+                log.info("FCM except-" + e.getMessage());
+                throw new RuntimeException(e);
+            }
         }
     }
 }
